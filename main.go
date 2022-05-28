@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gen2brain/beeep"
@@ -15,6 +17,8 @@ const serviceName = "Internet Notify service"
 const serviceShortName = "Internet Notify"
 const serviceDescription = "Internet notify will notify internet is connected or lost."
 
+var absPath string
+
 var logger service.Logger
 
 type program struct{}
@@ -25,7 +29,11 @@ func main() {
 		DisplayName: serviceShortName,
 		Description: serviceDescription,
 	}
-
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		panic(err)
+	}
+	absPath = dir
 	prg := &program{}
 	s, err := service.New(prg, svcConfig)
 	if err != nil {
@@ -107,7 +115,7 @@ func Retry(times int, f func() bool) bool {
 func Notify(title, message string, notiType string) error {
 	switch notiType {
 	case "info":
-		err := beeep.Notify(title, message, "assets/information.png")
+		err := beeep.Notify(title, message, absPath+"/assets/information.png")
 		if err != nil {
 			return err
 		}
@@ -117,7 +125,7 @@ func Notify(title, message string, notiType string) error {
 		}
 
 	case "warning":
-		err := beeep.Alert(title, message, "assets/warning.png")
+		err := beeep.Alert(title, message, absPath+"/assets/warning.png")
 		if err != nil {
 			return err
 		}
@@ -127,7 +135,7 @@ func Notify(title, message string, notiType string) error {
 		}
 
 	default:
-		err := beeep.Notify(title, message, "assets/information.png")
+		err := beeep.Notify(title, message, absPath+"/assets/information.png")
 		if err != nil {
 			return err
 		}
