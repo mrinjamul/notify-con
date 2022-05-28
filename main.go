@@ -2,24 +2,69 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/gen2brain/beeep"
+	"github.com/kardianos/service"
 )
 
+const serviceName = "Internet Notify service"
+const serviceShortName = "Internet Notify"
+const serviceDescription = "Internet notify will notify internet is connected or lost."
+
+var logger service.Logger
+
+type program struct{}
+
 func main() {
-	fmt.Println("INFO - Starting internet connection notifier...")
+	svcConfig := &service.Config{
+		Name:        serviceName,
+		DisplayName: serviceShortName,
+		Description: serviceDescription,
+	}
+
+	prg := &program{}
+	s, err := service.New(prg, svcConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logger, err = s.Logger(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = s.Run()
+	if err != nil {
+		logger.Error(err)
+	}
+}
+
+// service interfaces
+
+func (p *program) Start(s service.Service) error {
+	// Start should not block. Do the actual work async.
+	go p.run()
+	return nil
+}
+func (p *program) run() {
 	CheckConnection()
 }
+func (p *program) Stop(s service.Service) error {
+	// Stop should not block. Return with a few seconds.
+	return nil
+}
+
+// User functions
 
 // CheckConnection check if internet is up
 func CheckConnection() {
+	fmt.Println("INFO - Starting internet connection notifier...")
 	timeTicker := time.NewTicker(5 * time.Second)
-	var flagConnected bool = true
+	flagConnected := true
 	fmt.Println("INFO - Checking connection...")
 	for range timeTicker.C {
-		f := Retry(Connected)
+		f := Retry(2, Connected)
 		if flagConnected != f {
 			flagConnected = f
 			if flagConnected {
@@ -35,14 +80,17 @@ func CheckConnection() {
 
 // Connected checks if the client is connected to the server
 func Connected() (ok bool) {
-	_, err := http.Get("http://www.google.com")
+	client := http.Client{
+		Timeout: 1 * time.Second,
+	}
+	_, err := client.Get("http://clients3.google.com/generate_204")
 	return err == nil
 }
 
 // Retry tries to connect to the server
-func Retry(f func() bool) bool {
+func Retry(times int, f func() bool) bool {
 	var ok bool
-	for i := 0; i < 2; i++ {
+	for i := 0; i < times; i++ {
 		ok = f()
 		if ok {
 			return ok
