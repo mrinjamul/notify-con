@@ -111,15 +111,29 @@ func Notify(title, message string, notiType string) error {
 		if err != nil {
 			return err
 		}
+		err = beeep.Beep(beeep.DefaultFreq, 1000)
+		if err != nil {
+			panic(err)
+		}
+
 	case "warning":
 		err := beeep.Alert(title, message, "assets/warning.png")
 		if err != nil {
 			return err
 		}
+		err = beeep.Beep(beeep.DefaultFreq, 1000)
+		if err != nil {
+			panic(err)
+		}
+
 	default:
 		err := beeep.Notify(title, message, "assets/information.png")
 		if err != nil {
 			return err
+		}
+		err = beeep.Beep(beeep.DefaultFreq, 1000)
+		if err != nil {
+			panic(err)
 		}
 	}
 	return nil
