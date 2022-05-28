@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/gen2brain/beeep v0.0.0-20220518085355-d7852edf42fc
 	github.com/kardianos/service v1.2.1
+	github.com/robfig/cron v1.2.0
 )
 
 require (

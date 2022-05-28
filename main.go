@@ -8,6 +8,7 @@ import (
 
 	"github.com/gen2brain/beeep"
 	"github.com/kardianos/service"
+	"github.com/robfig/cron"
 )
 
 const serviceName = "Internet Notify service"
@@ -60,10 +61,11 @@ func (p *program) Stop(s service.Service) error {
 // CheckConnection check if internet is up
 func CheckConnection() {
 	fmt.Println("INFO - Starting internet connection notifier...")
-	timeTicker := time.NewTicker(5 * time.Second)
 	flagConnected := true
 	fmt.Println("INFO - Checking connection...")
-	for range timeTicker.C {
+	c := cron.New()
+	// runs every 5 seconds
+	c.AddFunc("*/5 * * * * *", func() {
 		f := Retry(2, Connected)
 		if flagConnected != f {
 			flagConnected = f
@@ -75,7 +77,8 @@ func CheckConnection() {
 				Notify("Internet connection is lost", "", "warning")
 			}
 		}
-	}
+	})
+	c.Start()
 }
 
 // Connected checks if the client is connected to the server
