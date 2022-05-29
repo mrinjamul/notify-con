@@ -2,7 +2,7 @@
 
 # Variables
 APPNAME="$(basename $PWD)"
-VERSION="v1.0.0"
+VERSION="v1.0.1"
 ASSETS="assets README.md LICENSE"
 
 # Functions
