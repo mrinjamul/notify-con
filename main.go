@@ -119,7 +119,7 @@ func Notify(title, message string, notiType string) error {
 		if err != nil {
 			return err
 		}
-		err = beeep.Beep(beeep.DefaultFreq, 1000)
+		err = beeep.Beep(beeep.DefaultFreq, beeep.DefaultDuration)
 		if err != nil {
 			panic(err)
 		}
@@ -129,7 +129,7 @@ func Notify(title, message string, notiType string) error {
 		if err != nil {
 			return err
 		}
-		err = beeep.Beep(beeep.DefaultFreq, 1000)
+		err = beeep.Beep(beeep.DefaultFreq, beeep.DefaultDuration)
 		if err != nil {
 			panic(err)
 		}
@@ -139,7 +139,7 @@ func Notify(title, message string, notiType string) error {
 		if err != nil {
 			return err
 		}
-		err = beeep.Beep(beeep.DefaultFreq, 1000)
+		err = beeep.Beep(beeep.DefaultFreq, beeep.DefaultDuration)
 		if err != nil {
 			panic(err)
 		}
